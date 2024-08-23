@@ -28,36 +28,35 @@ class axi_trans extends uvm_sequence_item;
 
    int unsigned          awuser, wuser[$], buser, aruser, ruser[$];
 
-   rand bit[7:0]         data[$];
-   rand bit              wstrb[$];
+   bit[7:0]         data[$];
+   bit              wstrb[$];
    bit [1:0]             bresp, rresp[$];
 
    bit [7:0]             data_val;
 
-   constraint data_c {
-      solve len before data;
-      solve wr_data before data;
-      data.size == (len+1)*get_width(size);
-      wstrb.size == (len+1)*get_width(size);
+   virtual function void post_randomize();
+      data = {};
+      wstrb = {};
+      for (int i=0; i<(len+1)*get_width(size); i++) begin
+          data = {data, 0};
+          wstrb = {wstrb, 1'b1};
+      end
       if (wr_data == RAND)
-         foreach(data[i]) {
-            data[i] inside { [0 : 255] };
-            wstrb[i] == 1'b1;
-         }
+         foreach(data[i]) begin
+            data[i] = $urandom_range(255);
+         end
       else if (wr_data == CONST)
-         foreach(data[i]) {
-            data[i] == data_val;
-            wstrb[i] == 1'b1;
-         }
+         foreach(data[i]) begin
+            data[i] = data_val;
+         end
       else //(wr_data = INCR)
-         foreach(data[i]) {
+         foreach(data[i]) begin
             if (i == 0)
-               data[i] == data_val;
+               data[i] = data_val;
             else
-               data[i] == data[i-1] + 1;
-            wstrb[i] == 1'b1;
-         }
-   }
+               data[i] = data[i-1] + 1;
+         end
+   endfunction
 
    function new(string name = "axi_trans");
       super.new(name);
