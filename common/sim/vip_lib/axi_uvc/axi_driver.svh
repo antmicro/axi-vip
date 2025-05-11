@@ -226,7 +226,7 @@ class axi_driver#(parameter ID_WIDTH   = 16,
       if (cfg.master) begin
          forever begin
             @(posedge cfg.axi_vi.clk iff
-               cfg.axi_vi.rst_n && cfg.axi_vi.cb.rready && cfg.axi_vi.cb.rvalid);
+               cfg.axi_vi.rst_n && cfg.axi_vi.cb.rready && cfg.axi_vi.cb.rvalid && cfg.axi_vi.cb.rlast);
             if (cfg.axi_vi.rst_n)
                uvm_test_done.drop_objection(this);
          end

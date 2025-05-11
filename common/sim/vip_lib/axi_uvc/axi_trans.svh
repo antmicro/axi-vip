@@ -34,11 +34,17 @@ class axi_trans extends uvm_sequence_item;
 
    bit [7:0]             data_val;
 
+   int unsigned          width;
+
+   function void pre_randomize();
+      width = get_width(size);
+   endfunction
+
    constraint data_c {
       solve len before data;
       solve wr_data before data;
-      data.size == (len+1)*get_width(size);
-      wstrb.size == (len+1)*get_width(size);
+      data.size == (len+1) * width;
+      wstrb.size == (len+1) * width;
       if (wr_data == RAND)
          foreach(data[i]) {
             data[i] inside { [0 : 255] };
